@@ -1,38 +1,79 @@
-/**
- * This is a basic starting point of the assignment
- * Modify the code according to your own needs and requirements
- */
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
 
-//const express = require('express')
-import express from 'express'; // <-- Module Style import
-import bodyParser from 'body-parser';
+//-------------------------
 
-// Importing user route
-import router from './routes/users.js';
-// const router = require('router')
+const Dish = require("./models/DishSchema");
+const Feedback = require("./models/FeedbackSchema");
 
-// const bodyParser = require('body-parser')
 
-const app = express()
-const port = 3001
+//-------------------------
+const app = express();
+app.use(cors());
+app.use(express.json());
+const port = 3001;
+// const { response } = require("express");
 
-app.use(bodyParser.json())
-// Adding a Router
-app.use('/users', router);
-
-app.get('/', (req, res) => {
-    res.send('Hello Universe!')
+//------------------------------------------------------------------------------
+let url="mongodb+srv://Khuzaima1896:amnaamna@cluster0.b63hjrb.mongodb.net/test";
+mongoose.connect(url
+).then(()=>{
+  console.log("Database Connected")
+})
+.catch(()=>{
+  console.log("Database not Connected")
 })
 
-app.get('/todos', (req, res) => {
-    res.send('A list of todo items will be returned')
-})
+//------------------------------------------------------------------------------
 
-app.post('/', (req, res) => {
-    console.log(req.body)
-    res.send('Posting a Request')
-})
+app.post("/api/addDish", async (req, res) => {
+  try {
+    const dish = await new Dish(req.body);
+    dish.save().then((response) => {
+      console.log(response);
+      res.json({ status: response });
+    });
+  } catch (error) {
+    res.json({ status: "error" });
+  }
+});
+
+
+app.post("/api/getDishes", async (req, res) => {
+  const result = await Dish.find({}, {  _id: 0 })
+    .then((response) => {
+      res.send(response);
+    })
+    .catch({ message: "error" });
+});
+
+
+app.post("/api/deleteDish", async (req, res) => {
+  const result = await Dish.deleteOne({
+    name: req.body.name,
+  });
+  if (result.deletedCount == 1) {
+    console.log("deleted");
+  } else {
+    console.log("not found");
+  }
+  res.send({ status: result });
+});
+
+
+//-------------------------------------------------------------------
+
+app.post("/api/getfeedbacks", async (req, res) => {
+  const result = await Feedback.find({}, { user_email: 1, feedback: 1, _id: 0 })
+    .then((response) => {
+      res.send(response);
+    })
+    .catch({ message: "error" });
+});
+
+//-------------------------------------------------------------------
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+  console.log(`Example app listening on port ${port}`);
+});

@@ -1,0 +1,13 @@
+.head {
+    background: #ffffff;
+    box-shadow: 0 15px 25px rgba(175, 173, 173, 0.6);
+    margin: -10px;
+    padding: 10px;
+    /* height: 1in; */
+  }
+  
+  .head img {
+    height: 0.6in;
+    width: 1.4in;
+    margin-left: 0.7in;
+  }
